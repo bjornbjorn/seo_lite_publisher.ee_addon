@@ -31,7 +31,7 @@ class Seo_lite_publisher_ext {
     public $docs_url    = '';
     public $name      = 'SEO Lite Publisher';
     public $settings_exist  = 'n';
-    public $version     = '1.0.0';
+    public $version     = '1.0.1';
 
     /**
      * Constructor
@@ -150,6 +150,12 @@ class Seo_lite_publisher_ext {
 
         $content['publisher_lang_id'] = ee()->publisher_lib->lang_id;
         $content['publisher_status']  = ee()->publisher_lib->publisher_save_status;
+
+        // if no SEO Lite title is specified we save the entry's title here - or else
+        // we would get the original language's entry title when getting data w/SEO Lite
+        if($content['title'] == '') {
+            $content['title'] = ee()->input->post('title');
+        }
 
         return array(
             'where' => $where,

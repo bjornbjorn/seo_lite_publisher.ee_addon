@@ -1,6 +1,6 @@
 # SEO Lite Publisher extension
 
-This extension will make SEO Lite compatible with Publisher. Has been tested with both Publisher 1.1.4 and 1.2.2.
+This extension will make SEO Lite compatible with Publisher.
 
 To install:
 
