@@ -130,10 +130,29 @@ class Seo_lite_publisher_ext {
 
     // the SEO Lite content to display in the SEO Lite tab
     public function seo_lite_tab_content($where, $table_name)
-    {
+    {   
+        $lang_id = ee()->publisher_lib->lang_id;
+        $status = ee()->publisher_lib->status;
+        
+        if (ee()->publisher_setting->show_fallback()) {
+            /** CI_DB_result $q */
+            $translatedWhere = array(
+                'publisher_lang_id' => $lang_id,
+                'publisher_status' => $status,
+            );
+            if (isset($where['entry_id'])) {
+                $translatedWhere['entry_id'] = $where['entry_id'];
+            }
+            $q = ee()->db->get_where('publisher_seolite_content', $translatedWhere);
+            
+            if (!$q->num_rows()) {
+                $lang_id = ee()->publisher_lib->default_lang_id;
+            }
+        }
+        
         // where arr used w/activerecord
-        $where['publisher_lang_id'] = ee()->publisher_lib->lang_id;
-        $where['publisher_status']  = ee()->publisher_lib->status;
+        $where['publisher_lang_id'] = $lang_id;
+        $where['publisher_status']  = $status;
 
         return array(
             'where' => $where,
@@ -165,10 +184,30 @@ class Seo_lite_publisher_ext {
     }
 
     // called from the frontend
-    public function seo_lite_fetch_data($where, $table_name) {
+    public function seo_lite_fetch_data($where, $table_name)
+    {
+        $lang_id = ee()->publisher_lib->lang_id;
+        $status = ee()->publisher_lib->status;
+        
+        if (ee()->publisher_setting->show_fallback()) {
+            /** CI_DB_result $q */
+            $translatedWhere = array(
+                'publisher_lang_id' => $lang_id,
+                'publisher_status' => $status,
+            );
+            if (isset($where['t.entry_id'])) {
+                $translatedWhere['entry_id'] = $where['t.entry_id'];
+            }
+            $q = ee()->db->get_where('publisher_seolite_content', $translatedWhere);
+            
+            if (!$q->num_rows()) {
+                $lang_id = ee()->publisher_lib->default_lang_id;
+            }
+        }
+        
         // where arr used w/activerecord
-        $where['publisher_lang_id'] = ee()->publisher_lib->lang_id;
-        $where['publisher_status']  = ee()->publisher_lib->status;
+        $where['publisher_lang_id'] = $lang_id;
+        $where['publisher_status']  = $status;
 
         return array(
             'where' => $where,
