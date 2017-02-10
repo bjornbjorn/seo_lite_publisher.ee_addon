@@ -196,25 +196,28 @@ class Seo_lite_publisher_ext {
                 'publisher_status' => $status,
             );
             if (isset($where['t.entry_id'])) {
+                die('1');
                 $translatedWhere['entry_id'] = $where['t.entry_id'];
-            // seo_lite tag is probably using the use_last_segment="yes" param
             } else if (isset($where['url_title'])) {
                 if (ee()->publisher_setting->url_translations()) {
-                    $entryId = ee()->db->get_where('publisher_titles', array_merge(
+                    $entry = ee()->db->get_where('publisher_titles', array_merge(
                         $translatedWhere, array('url_title' => $where['url_title'])
-                    ))->row('entry_id');
+                    ));
 
-                    if (!$entryId) {
-                        $entryId = ee()->db->get_where('channel_titles', array(
+                    if (!$entry->num_rows()) {
+                        $entry = ee()->db->get_where('channel_titles', array(
                             'url_title' => $where['url_title']
-                        ))->row('entry_id');
+                        ));
                     }
                 } else {
-                    $entryId = ee()->db->get_where('channel_titles', array(
+                    $entry = ee()->db->get_where('channel_titles', array(
                         'url_title' => $where['url_title']
-                    ))->row('entry_id');
+                    ));
                 }
-                $translatedWhere['entry_id'] = $entryId;
+
+                if ($entry->num_rows()) {
+                    $translatedWhere['entry_id'] = $entry->row('entry_id');
+                }
             }
 
             $q = ee()->db->get_where('publisher_seolite_content', $translatedWhere);
