@@ -130,10 +130,10 @@ class Seo_lite_publisher_ext {
 
     // the SEO Lite content to display in the SEO Lite tab
     public function seo_lite_tab_content($where, $table_name)
-    {   
+    {
         $lang_id = ee()->publisher_lib->lang_id;
         $status = ee()->publisher_lib->status;
-        
+
         if (ee()->publisher_setting->show_fallback()) {
             /** CI_DB_result $q */
             $translatedWhere = array(
@@ -144,12 +144,12 @@ class Seo_lite_publisher_ext {
                 $translatedWhere['entry_id'] = $where['entry_id'];
             }
             $q = ee()->db->get_where('publisher_seolite_content', $translatedWhere);
-            
+
             if (!$q->num_rows()) {
                 $lang_id = ee()->publisher_lib->default_lang_id;
             }
         }
-        
+
         // where arr used w/activerecord
         $where['publisher_lang_id'] = $lang_id;
         $where['publisher_status']  = $status;
@@ -188,7 +188,7 @@ class Seo_lite_publisher_ext {
     {
         $lang_id = ee()->publisher_lib->lang_id;
         $status = ee()->publisher_lib->status;
-        
+
         if (ee()->publisher_setting->show_fallback()) {
             /** CI_DB_result $q */
             $translatedWhere = array(
@@ -196,7 +196,6 @@ class Seo_lite_publisher_ext {
                 'publisher_status' => $status,
             );
             if (isset($where['t.entry_id'])) {
-                die('1');
                 $translatedWhere['entry_id'] = $where['t.entry_id'];
             } else if (isset($where['url_title'])) {
                 if (ee()->publisher_setting->url_translations()) {
@@ -226,7 +225,7 @@ class Seo_lite_publisher_ext {
                 $lang_id = ee()->publisher_lib->default_lang_id;
             }
         }
-        
+
         // where arr used w/activerecord
         $where['publisher_lang_id'] = $lang_id;
         $where['publisher_status']  = $status;
