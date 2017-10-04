@@ -36,7 +36,7 @@ class Seo_lite_publisher_ext {
     private $publisherSetting;
 
     /**
-     * @param   mixed Settings array or empty string if none exist.
+     * @param mixed Settings array or empty string if none exist.
      */
     public function __construct($settings = '')
     {
@@ -64,52 +64,60 @@ class Seo_lite_publisher_ext {
             // 1. Create new table for Publisher translated versions of SEO Lite
             ee()->load->dbforge();
 
-            $publisher_seolite_content_fields = array(
-                'publisher_seolite_content_id' => array(
+            $publisher_seolite_content_fields = [
+                'publisher_seolite_content_id' => [
                     'type' => 'int',
                     'constraint' => '10',
-                    'unsigned' => TRUE,
-                    'auto_increment' => TRUE,),
-                'site_id' => array(
+                    'unsigned' => true,
+                    'auto_increment' => true,
+                    ],
+                'site_id' => [
                     'type' => 'int',
                     'constraint' => '10',
-                    'null' => FALSE,),
-                'entry_id' => array(
+                    'null' => false,
+                    ],
+                'entry_id' => [
                     'type' => 'int',
                     'constraint' => '10',
-                    'null' => FALSE,),
-                'title' => array(
+                    'null' => false,
+                    ],
+                'title' => [
                     'type' => 'varchar',
                     'constraint' => '1024',
-                    'null' => FALSE,),
-                'keywords' => array(
+                    'null' => false,
+                    ],
+                'keywords' => [
                     'type' => 'varchar',
                     'constraint' => '1024',
-                    'null' => FALSE,),
-                'description' => array(
-                    'type' => 'text',),
-                'publisher_status' => array(
-                    'type' => 'text',),
-                'publisher_lang_id' => array(
+                    'null' => false,
+                    ],
+                'description' => [
+                    'type' => 'text',
+                    ],
+                'publisher_status' => [
+                    'type' => 'text',
+                    ],
+                'publisher_lang_id' => [
                     'type' => 'int',
                     'constraint' => '10',
-                    'null' => FALSE,),
-            );
+                    'null' => false,
+                    ],
+            ];
 
             ee()->dbforge->add_field($publisher_seolite_content_fields);
-            ee()->dbforge->add_key('publisher_seolite_content_id', TRUE);
+            ee()->dbforge->add_key('publisher_seolite_content_id', true);
             ee()->dbforge->create_table('publisher_seolite_content');
         }
 
         /**
          * Hook on to SEO Lite
          */
-        $hooks = array(
+        $hooks = [
             'seo_lite_tab_content', 'seo_lite_tab_content_save', 'seo_lite_fetch_data'
-        );
+        ];
 
         foreach($hooks as $hook) {
-            ee()->db->insert('extensions', array(
+            ee()->db->insert('extensions', [
                 'class' => __CLASS__,
                 'hook' => $hook,
                 'method' => $hook,
@@ -117,27 +125,26 @@ class Seo_lite_publisher_ext {
                 'settings' => serialize($this->settings),
                 'version' => $this->version,
                 'enabled' => 'y',
-            ));
+            ]);
         }
     }
 
-
-    /* ===========================================================
-        SEO Lite support
-    ============================================================ */
-
-    // the SEO Lite content to display in the SEO Lite tab
+    /**
+     * @param $where
+     * @param $table_name
+     * @return array
+     */
     public function seo_lite_tab_content($where, $table_name)
     {
         $langId = $this->currentLanguageId;
         $status = $this->currentStatus;
 
         if (ee()->publisher_setting->show_fallback()) {
-            /** CI_DB_result $q */
-            $translatedWhere = array(
+            /** @var CI_DB_result $q */
+            $translatedWhere = [
                 'publisher_lang_id' => $langId,
                 'publisher_status' => $status,
-            );
+            ];
             if (isset($where['entry_id'])) {
                 $translatedWhere['entry_id'] = $where['entry_id'];
             }
@@ -152,13 +159,18 @@ class Seo_lite_publisher_ext {
         $where['publisher_lang_id'] = $langId;
         $where['publisher_status']  = $status;
 
-        return array(
+        return [
             'where' => $where,
             'table_name' => 'publisher_seolite_content' // pull content from Publisher saved data instead of default SEO Lite content
-        );
+        ];
     }
 
-    // the SEO Lite content to save
+    /**
+     * @param $where
+     * @param $table_name
+     * @param $content
+     * @return array
+     */
     public function seo_lite_tab_content_save($where, $table_name, $content)
     {
         // where arr used w/activerecord
@@ -174,11 +186,11 @@ class Seo_lite_publisher_ext {
             $content['title'] = ee()->input->post('title');
         }
 
-        return array(
+        return [
             'where' => $where,
             'table_name' => 'publisher_seolite_content', // save data to this table instead
             'content' => $content,  // additional content
-        );
+        ];
     }
 
     /**
@@ -193,28 +205,29 @@ class Seo_lite_publisher_ext {
         $status = $this->currentStatus;
 
         if ($this->publisherSetting->show_fallback()) {
-            /** CI_DB_result $q */
-            $translatedWhere = array(
+            /** @var CI_DB_result $q */
+            $translatedWhere = [
                 'publisher_lang_id' => $langId,
                 'publisher_status' => $status,
-            );
+            ];
             if (isset($where['t.entry_id'])) {
                 $translatedWhere['entry_id'] = $where['t.entry_id'];
             } else if (isset($where['url_title'])) {
-                if ($this->publisherSetting->get('url_translations') {
+                if ($this->publisherSetting->get('url_translations')) {
+                    /** @var CI_DB_result $entry */
                     $entry = ee()->db->get_where('publisher_titles', array_merge(
                         $translatedWhere, array('url_title' => $where['url_title'])
                     ));
 
                     if (!$entry->num_rows()) {
-                        $entry = ee()->db->get_where('channel_titles', array(
+                        $entry = ee()->db->get_where('channel_titles', [
                             'url_title' => $where['url_title']
-                        ));
+                        ]);
                     }
                 } else {
-                    $entry = ee()->db->get_where('channel_titles', array(
+                    $entry = ee()->db->get_where('channel_titles', [
                         'url_title' => $where['url_title']
-                    ));
+                    ]);
                 }
 
                 if ($entry->num_rows()) {
@@ -233,10 +246,10 @@ class Seo_lite_publisher_ext {
         $where['publisher_lang_id'] = $langId;
         $where['publisher_status'] = $status;
 
-        return array(
+        return [
             'where' => $where,
             'table_name' => 'publisher_seolite_content' // pull content from Publisher saved data instead of default SEO Lite content
-        );
+        ];
     }
 
 
@@ -245,7 +258,7 @@ class Seo_lite_publisher_ext {
      */
     public function disable_extension()
     {
-        ee()->db->delete('extensions', array('class' => __CLASS__));
+        ee()->db->delete('extensions', ['class' => __CLASS__]);
 
         // do not delete the publisher_seolite_content table here to allow for enabling / disabling of extension w/o losing data ..
     }
@@ -255,9 +268,9 @@ class Seo_lite_publisher_ext {
      */
     public function update_extension($current = '')
     {
-        if ($current == '' OR $current == $this->version)
+        if ($current == '' || $current == $this->version)
         {
-            return FALSE;
+            return false;
         }
     }
 }
